@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+*.user
+*.db
+*.db-wal
+*.db-shm
+*.sqlite*
+Logs/
+Backups/
+TestResults/
