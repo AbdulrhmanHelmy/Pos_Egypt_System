@@ -1,7 +1,6 @@
 using HeCashier.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using System.Configuration;
 using System.IO;
 
 namespace HeCashier.Data;
@@ -13,15 +12,22 @@ public sealed class DatabaseInitializer
     public string? ConfigurationError { get; }
     public IDbContextFactory<HeCashierDbContext> Factory { get; }
 
-    public DatabaseInitializer()
+    private readonly IPasswordHasher _passwordHasher;
+
+    public DatabaseInitializer(
+        string? environmentRoot,
+        string? configuredRoot,
+        string localApplicationData,
+        IPasswordHasher? passwordHasher = null)
     {
         var resolution = DataPathResolver.Resolve(
-            Environment.GetEnvironmentVariable("HECASHIER_DATA_ROOT"),
-            ConfigurationManager.AppSettings["DataRoot"],
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+            environmentRoot,
+            configuredRoot,
+            localApplicationData);
         DataRoot = resolution.DataRoot;
         DatabasePath = resolution.DatabasePath;
         ConfigurationError = resolution.Error;
+        _passwordHasher = passwordHasher ?? new PasswordHasher();
         var options = new DbContextOptionsBuilder<HeCashierDbContext>().UseSqlite($"Data Source={DatabasePath}").Options;
         Factory = new PooledDbContextFactory<HeCashierDbContext>(options);
     }
@@ -34,11 +40,13 @@ public sealed class DatabaseInitializer
         Directory.CreateDirectory(DataRoot);
         await using var db = await Factory.CreateDbContextAsync();
         await db.Database.EnsureCreatedAsync();
+#if DEBUG
         if (!await db.Users.AnyAsync() && seedDevelopmentUser)
         {
-            db.Users.Add(new Models.User { UserName = "devadmin", PasswordHash = PasswordHasher.Hash("HeCashierDev2026!") });
+            db.Users.Add(new Models.User { UserName = "devadmin", PasswordHash = _passwordHasher.Hash("HeCashierDev2026!") });
             await db.SaveChangesAsync();
         }
+#endif
 
         return !await db.Users.AnyAsync();
     }

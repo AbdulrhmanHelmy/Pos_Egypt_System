@@ -1,3 +1,6 @@
 <Solution>
+  <Project Path="HeCashier.Core/HeCashier.Core.csproj" />
+  <Project Path="HeCashier.Infrastructure/HeCashier.Infrastructure.csproj" />
+  <Project Path="tests/HeCashier.Tests/HeCashier.Tests.csproj" />
   <Project Path="Pos_Egypt.UI/Pos_Egypt.UI.csproj" Id="12264920-ef56-4f8f-9515-907955d4fa52" />
 </Solution>

@@ -2,9 +2,9 @@ using System.Security.Cryptography;
 
 namespace HeCashier.Security;
 
-public static class PasswordHasher
+public sealed class PasswordHasher : IPasswordHasher
 {
-    public static string Hash(string password)
+    public string Hash(string password)
     {
         ArgumentException.ThrowIfNullOrEmpty(password);
         var salt = RandomNumberGenerator.GetBytes(16);
@@ -12,7 +12,7 @@ public static class PasswordHasher
         return $"PBKDF2-SHA256:120000:{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
     }
 
-    public static bool Verify(string password, string encoded)
+    public bool Verify(string password, string encoded)
     {
         var parts = encoded.Split(':');
         if (parts.Length != 4 || !int.TryParse(parts[1], out var iterations)) return false;

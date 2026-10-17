@@ -1,8 +1,10 @@
 using System.Windows;
 using System.Windows.Threading;
 using System.IO;
+using System.Configuration;
 using HeCashier.Data;
 using HeCashier.Diagnostics;
+using HeCashier.Security;
 using HeCashier.Services;
 using HeCashier.ViewModels;
 using HeCashier.Views;
@@ -11,11 +13,15 @@ namespace HeCashier;
 
 public partial class App : Application
 {
-    private readonly DatabaseInitializer _databaseInitializer = new();
+    private readonly DatabaseInitializer _databaseInitializer;
     private readonly FileLogger _logger;
 
     public App()
     {
+        _databaseInitializer = new DatabaseInitializer(
+            Environment.GetEnvironmentVariable("HECASHIER_DATA_ROOT"),
+            ConfigurationManager.AppSettings["DataRoot"],
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
         _logger = new FileLogger(() => _databaseInitializer.DataRoot);
         DispatcherUnhandledException += OnDispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
@@ -26,17 +32,11 @@ public partial class App : Application
     {
         try
         {
-            bool seedDevelopmentUser;
-#if DEBUG
-            seedDevelopmentUser = true;
-#else
-            seedDevelopmentUser = false;
-#endif
-            var initialSetupRequired = await _databaseInitializer.InitializeAsync(seedDevelopmentUser);
+            await _databaseInitializer.InitializeAsync(seedDevelopmentUser: true);
             MainWindow = new LoginWindow(new LoginViewModel(
                 new AuthenticationService(_databaseInitializer.Factory),
                 OpenShell,
-                initialSetupRequired));
+                _logger));
             MainWindow.Show();
         }
         catch (Exception exception)
@@ -77,7 +77,8 @@ public partial class App : Application
     {
         var shell = new MainWindow(new ShellViewModel(
             user,
-            new ShiftService(_databaseInitializer.Factory)));
+            new ShiftService(_databaseInitializer.Factory, _logger),
+            _logger));
         MainWindow = shell;
         shell.Show();
     }

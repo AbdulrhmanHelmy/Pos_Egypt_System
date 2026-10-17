@@ -12,13 +12,11 @@
             <TextBox Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged}" />
             <TextBlock Text="كلمة المرور" Margin="0,10,0,0"/>
             <PasswordBox x:Name="PasswordInput" PasswordChanged="PasswordChanged"/>
-            <TextBlock Text="{Binding InitialSetupRequiredMessage}" Foreground="{DynamicResource DangerBrush}" Margin="0,8" TextWrapping="Wrap"/>
             <TextBlock Text="{Binding Error}" Foreground="{DynamicResource DangerBrush}" Margin="0,8" TextWrapping="Wrap"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,16,0,0">
                 <Button Content="خروج" Command="{Binding ExitCommand}" Padding="24,10" Margin="8,0"/>
                 <Button Content="دخول" Command="{Binding LoginCommand}" Padding="30,10" Background="{DynamicResource AccentBrush}" Foreground="#101512"/>
             </StackPanel>
-            <TextBlock Text="{Binding DevelopmentCredentialsHint}" Foreground="{DynamicResource MutedTextBrush}" FontSize="11" Margin="0,22,0,0"/>
         </StackPanel>
     </Grid>
 </Window>
