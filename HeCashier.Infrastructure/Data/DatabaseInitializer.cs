@@ -40,13 +40,21 @@ public sealed class DatabaseInitializer
         Directory.CreateDirectory(DataRoot);
         await using var db = await Factory.CreateDbContextAsync();
         await db.Database.EnsureCreatedAsync();
+        if (!await db.Categories.AnyAsync())
+            db.Categories.Add(new Models.Category { Name = "عام" });
+        if (!await db.Units.AnyAsync())
+            db.Units.Add(new Models.Unit { Name = "قطعة" });
+        if (!await db.Stores.AnyAsync())
+            db.Stores.Add(new Models.Store { Name = "محل" });
+        if (!await db.SystemSettings.AnyAsync(x => x.Key == "AllowNegativeStock"))
+            db.SystemSettings.Add(new Models.SystemSetting { Key = "AllowNegativeStock", Value = "false" });
 #if DEBUG
         if (!await db.Users.AnyAsync() && seedDevelopmentUser)
         {
             db.Users.Add(new Models.User { UserName = "devadmin", PasswordHash = _passwordHasher.Hash("HeCashierDev2026!") });
-            await db.SaveChangesAsync();
         }
 #endif
+        await db.SaveChangesAsync();
 
         return !await db.Users.AnyAsync();
     }

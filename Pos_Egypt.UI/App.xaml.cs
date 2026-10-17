@@ -8,6 +8,7 @@ using HeCashier.Security;
 using HeCashier.Services;
 using HeCashier.ViewModels;
 using HeCashier.Views;
+using HeCashier.Infrastructure.Services;
 
 namespace HeCashier;
 
@@ -78,7 +79,11 @@ public partial class App : Application
         var shell = new MainWindow(new ShellViewModel(
             user,
             new ShiftService(_databaseInitializer.Factory, _logger),
-            _logger));
+            _logger,
+            new ProductService(_databaseInitializer.Factory),
+            new InventoryService(_databaseInitializer.Factory),
+            new CategoryAndUnitService(_databaseInitializer.Factory),
+            new SystemSettingsService(_databaseInitializer.Factory)));
         MainWindow = shell;
         shell.Show();
     }

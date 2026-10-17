@@ -68,8 +68,8 @@ public sealed class FoundationTests
 
         db.Users.Add(new User { UserName = "cashier", PasswordHash = "hash" });
         db.Roles.Add(new Role { Name = "Admin" });
-        var firstProduct = new Product { Name = "First" };
-        var secondProduct = new Product { Name = "Second" };
+        var firstProduct = new Product { Code = "P-1", Name = "First" };
+        var secondProduct = new Product { Code = "P-2", Name = "Second" };
         db.Products.AddRange(firstProduct, secondProduct);
         await db.SaveChangesAsync();
 
@@ -81,9 +81,9 @@ public sealed class FoundationTests
         await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());
         db.ChangeTracker.Clear();
 
-        db.Barcodes.Add(new Barcode { Value = "12345", ProductId = firstProduct.Id });
+        db.Barcodes.Add(new ProductBarcode { Value = "12345", ProductId = firstProduct.Id });
         await db.SaveChangesAsync();
-        db.Barcodes.Add(new Barcode { Value = "12345", ProductId = secondProduct.Id });
+        db.Barcodes.Add(new ProductBarcode { Value = "12345", ProductId = secondProduct.Id });
         await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());
     }
 
@@ -103,7 +103,8 @@ public sealed class FoundationTests
         Assert.All(decimalProperties, property =>
         {
             Assert.Equal(18, property.GetPrecision());
-            Assert.Equal(property.Name is "Quantity" or "ReorderPoint" ? 3 : 2, property.GetScale());
+            Assert.Equal(property.Name is "Quantity" or "ReorderPoint" or "Weight" or "PackagingQuantity" or
+                "BeforeQuantity" or "AfterQuantity" or "SystemQuantity" or "ActualQuantity" or "Difference" ? 3 : 2, property.GetScale());
         });
     }
 

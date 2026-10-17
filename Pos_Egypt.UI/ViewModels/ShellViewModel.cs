@@ -23,20 +23,33 @@ public sealed class ShellViewModel : ViewModelBase
     public object CurrentView { get => _currentView; private set => SetProperty(ref _currentView, value); }
     public ObservableCollection<NavigationItem> NavigationItems { get; } = new();
 
-    public ShellViewModel(AuthenticatedUser user, IShiftService shiftService, FileLogger logger)
+    public ShellViewModel(
+        AuthenticatedUser user,
+        IShiftService shiftService,
+        FileLogger logger,
+        IProductService productService,
+        IInventoryService inventoryService,
+        ICategoryAndUnitService lookups,
+        ISystemSettingsService settings)
     {
         _user = user; _shiftService = shiftService; _logger = logger;
         Add("الرئيسية", "لوحة التحكم");
         Add("المبيعات", "المبيعات");
         Add("المشتريات", "المشتريات");
-        Add("المنتجات والمخزون", "المنتجات والمخزون");
+        NavigationItems.Add(new("المنتجات والمخزون", new RelayCommand(() =>
+            CurrentView = new InventoryView(new InventoryViewModel(productService, inventoryService, lookups, user.Id)))));
+        NavigationItems.Add(new("التعديل السريع للأسعار والكمية", new RelayCommand(() =>
+            CurrentView = new QuickProductEditView(new QuickProductEditViewModel(productService, user.Id)))));
+        NavigationItems.Add(new("الأقسام والوحدات والإعدادات", new RelayCommand(() =>
+            CurrentView = new SubSectionsView(new SubSectionsViewModel(lookups, settings)))));
         Add("العملاء", "العملاء");
         Add("الموردين", "الموردين");
         Add("المرتجعات", "المرتجعات");
         Add("المصروفات والخزينة", "المصروفات والخزينة");
         Add("التقارير", "التقارير");
         Add("الموظفين", "الموظفين");
-        Add("الإعدادات", "الإعدادات");
+        NavigationItems.Add(new("الإعدادات", new RelayCommand(() =>
+            CurrentView = new SubSectionsView(new SubSectionsViewModel(lookups, settings)))));
         Add("المستخدمون والصلاحيات", "المستخدمون والصلاحيات");
         NavigationItems.Add(new("بدء وردية", new RelayCommand(async () => await StartShiftAsync())));
         CurrentDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm");

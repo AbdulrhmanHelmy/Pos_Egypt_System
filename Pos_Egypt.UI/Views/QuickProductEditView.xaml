@@ -1,0 +1,32 @@
+<UserControl x:Class="HeCashier.Views.QuickProductEditView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             FlowDirection="RightToLeft">
+    <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+        <TextBlock Text="التعديل السريع للأسعار والكمية والباركود" FontSize="27" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,18"/>
+        <Border Grid.Row="1" Background="{DynamicResource CardBrush}" CornerRadius="8" Padding="16" Margin="0,0,0,14">
+            <DockPanel>
+                <Button Content="بحث" Command="{Binding SearchCommand}" DockPanel.Dock="Left" Padding="22,8" Margin="8,0"/>
+                <TextBox Text="{Binding LookupText, UpdateSourceTrigger=PropertyChanged}" MinWidth="350" ToolTip="امسح الباركود أو ابحث باسم الصنف">
+                    <TextBox.InputBindings><KeyBinding Key="Enter" Command="{Binding SearchCommand}"/></TextBox.InputBindings>
+                </TextBox>
+                <TextBlock Text="امسح الباركود أو اكتب اسم الصنف" VerticalAlignment="Center" Margin="14,0" Foreground="{DynamicResource MutedTextBrush}"/>
+            </DockPanel>
+        </Border>
+        <Border Grid.Row="2" Background="{DynamicResource CardBrush}" CornerRadius="8" Padding="24" MaxHeight="420" VerticalAlignment="Top">
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                <TextBlock Grid.ColumnSpan="2" Text="{Binding Product.Name}" FontSize="21" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="4,0,4,14"/>
+                <StackPanel Grid.Row="1" Margin="6"><TextBlock Text="سعر الشراء"/><TextBox Text="{Binding PurchasePrice, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="1" Margin="6"><TextBlock Text="سعر البيع"/><TextBox Text="{Binding SellingPrice, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
+                <StackPanel Grid.Row="2" Margin="6"><TextBlock Text="الكمية"/><TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="1" Margin="6"><TextBlock Text="الباركود الرئيسي"/><TextBox Text="{Binding Barcode, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
+                <CheckBox Grid.Row="3" Grid.ColumnSpan="2" Content="الصنف نشط" IsChecked="{Binding IsActive}" Margin="6,12"/>
+                <Button Grid.Row="4" Content="حفظ فوراً" Command="{Binding SaveCommand}" Padding="22,9" HorizontalAlignment="Right" Margin="6,10"/>
+                <TextBlock Grid.Row="5" Grid.ColumnSpan="2" Text="{Binding StatusMessage}" Foreground="{DynamicResource AccentBrush}" Margin="6,10"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
