@@ -108,6 +108,7 @@ public sealed class HeCashierDbContext(DbContextOptions<HeCashierDbContext> opti
         modelBuilder.Entity<BarcodeLabelTemplate>().HasIndex(x => x.Name).IsUnique();
         modelBuilder.Entity<BarcodeLabelElement>().HasIndex(x => new { x.BarcodeLabelTemplateId, x.FieldKey }).IsUnique();
         modelBuilder.Entity<InstallmentSchedule>().HasIndex(x => new { x.InstallmentContractId, x.SequenceNumber }).IsUnique();
+        modelBuilder.Entity<Shift>().HasIndex(x => x.UserId).IsUnique().HasFilter("\"Status\" = 0");
 
         modelBuilder.Entity<UserRole>().HasKey(x => new { x.UserId, x.RoleId });
         modelBuilder.Entity<RolePermission>().HasKey(x => new { x.RoleId, x.PermissionId });
@@ -140,6 +141,7 @@ public sealed class HeCashierDbContext(DbContextOptions<HeCashierDbContext> opti
         modelBuilder.Entity<DamagedStockRecord>().HasOne(x => x.InventoryMovement).WithMany().HasForeignKey(x => x.InventoryMovementId);
 
         modelBuilder.Entity<Shift>().HasOne(x => x.User).WithMany(x => x.Shifts).HasForeignKey(x => x.UserId);
+        modelBuilder.Entity<Shift>().HasOne(x => x.Safe).WithMany().HasForeignKey(x => x.SafeId);
         modelBuilder.Entity<Sale>().HasOne(x => x.Customer).WithMany(x => x.Sales).HasForeignKey(x => x.CustomerId);
         modelBuilder.Entity<Sale>().HasOne(x => x.Shift).WithMany(x => x.Sales).HasForeignKey(x => x.ShiftId);
         modelBuilder.Entity<Sale>().HasOne(x => x.Store).WithMany().HasForeignKey(x => x.StoreId);
@@ -174,6 +176,7 @@ public sealed class HeCashierDbContext(DbContextOptions<HeCashierDbContext> opti
         modelBuilder.Entity<ExternalDebt>().HasOne(x => x.Customer).WithMany(x => x.ExternalDebts).HasForeignKey(x => x.CustomerId);
         modelBuilder.Entity<ExternalDebt>().HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId);
         modelBuilder.Entity<CustomerCheck>().HasOne(x => x.Customer).WithMany(x => x.Checks).HasForeignKey(x => x.CustomerId);
+        modelBuilder.Entity<CustomerCheck>().HasOne(x => x.FinancialTransaction).WithMany().HasForeignKey(x => x.FinancialTransactionId);
         modelBuilder.Entity<SupplierTransaction>().HasOne(x => x.Supplier).WithMany(x => x.Transactions).HasForeignKey(x => x.SupplierId);
         modelBuilder.Entity<SupplierTransaction>().HasOne(x => x.Purchase).WithMany().HasForeignKey(x => x.PurchaseId);
         modelBuilder.Entity<SupplierTransaction>().HasOne(x => x.FinancialTransaction).WithMany(x => x.SupplierTransactions).HasForeignKey(x => x.FinancialTransactionId);

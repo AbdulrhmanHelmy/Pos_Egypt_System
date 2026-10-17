@@ -8,6 +8,13 @@ public enum ShiftStatus
     Closed
 }
 
+public enum CustomerCheckStatus
+{
+    Pending,
+    Collected,
+    Rejected
+}
+
 public enum FinancialTransactionType
 {
     OpeningBalance,
@@ -193,6 +200,8 @@ public class Shift
 
     public int UserId { get; set; }
     public User User { get; set; } = null!;
+    public int? SafeId { get; set; }
+    public Safe? Safe { get; set; }
     public DateTime StartedAtUtc { get; set; }
     public DateTime? ClosedAtUtc { get; set; }
     public decimal OpeningBalance { get; set; }

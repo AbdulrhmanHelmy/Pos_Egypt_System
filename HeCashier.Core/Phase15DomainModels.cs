@@ -40,6 +40,8 @@ public class CustomerTransaction
     public Customer Customer { get; set; } = null!;
     public PartyTransactionType Type { get; set; }
     public decimal Amount { get; set; }
+    public decimal BalanceBefore { get; set; }
+    public decimal BalanceAfter { get; set; }
     public DateTime OccurredAtUtc { get; set; }
     [MaxLength(50)]
     public string? ReferenceNumber { get; set; }
@@ -62,6 +64,8 @@ public class SupplierTransaction
     public Supplier Supplier { get; set; } = null!;
     public PartyTransactionType Type { get; set; }
     public decimal Amount { get; set; }
+    public decimal BalanceBefore { get; set; }
+    public decimal BalanceAfter { get; set; }
     public DateTime OccurredAtUtc { get; set; }
     [MaxLength(50)]
     public string? ReferenceNumber { get; set; }
@@ -105,6 +109,9 @@ public class CustomerCheck
     public DateTime IssuedAtUtc { get; set; }
     public DateTime? DueAtUtc { get; set; }
     public DateTime? ClearedAtUtc { get; set; }
+    public CustomerCheckStatus Status { get; set; } = CustomerCheckStatus.Pending;
+    public int? FinancialTransactionId { get; set; }
+    public FinancialTransaction? FinancialTransaction { get; set; }
     [MaxLength(150)]
     public string? BankName { get; set; }
     public bool IsPromissoryNote { get; set; }
