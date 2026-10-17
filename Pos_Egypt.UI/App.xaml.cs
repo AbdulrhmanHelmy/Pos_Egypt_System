@@ -16,7 +16,7 @@ public partial class App : Application
 
     public App()
     {
-        _logger = new FileLogger(() => Path.GetDirectoryName(_databaseInitializer.DatabasePath)!);
+        _logger = new FileLogger(() => _databaseInitializer.DataRoot);
         DispatcherUnhandledException += OnDispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
