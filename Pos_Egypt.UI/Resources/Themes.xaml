@@ -30,6 +30,12 @@
         <Setter Property="Background" Value="{DynamicResource InputBrush}"/><Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
         <Setter Property="BorderBrush" Value="#4A5568"/><Setter Property="Padding" Value="10,8"/><Setter Property="Margin" Value="0,4"/>
     </Style>
-    <Style TargetType="PasswordBox" BasedOn="{StaticResource {x:Type TextBox}}"/>
+    <Style TargetType="PasswordBox">
+        <Setter Property="Background" Value="{DynamicResource InputBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+        <Setter Property="BorderBrush" Value="#4A5568"/>
+        <Setter Property="Padding" Value="10,8"/>
+        <Setter Property="Margin" Value="0,4"/>
+    </Style>
     <Style TargetType="DataGrid"><Setter Property="Background" Value="{DynamicResource CardBrush}"/><Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/><Setter Property="RowBackground" Value="{DynamicResource CardBrush}"/><Setter Property="AlternatingRowBackground" Value="#2B3340"/></Style>
 </ResourceDictionary>
