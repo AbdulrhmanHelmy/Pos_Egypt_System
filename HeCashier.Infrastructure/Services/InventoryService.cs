@@ -214,10 +214,14 @@ internal static class InventoryRules
 
     public static async Task<Store> GetDefaultStoreAsync(HeCashierDbContext db)
     {
-        var store = await db.Stores.OrderBy(x => x.Id).FirstOrDefaultAsync(x => x.IsActive);
+        var store = await db.Stores
+            .Where(x => x.IsActive)
+            .OrderByDescending(x => x.IsDefault)
+            .ThenBy(x => x.Id)
+            .FirstOrDefaultAsync();
         if (store is not null)
             return store;
-        store = new Store { Name = "محل" };
+        store = new Store { Name = "المخزن الرئيسي", IsDefault = true };
         db.Stores.Add(store);
         await db.SaveChangesAsync();
         return store;

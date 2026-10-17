@@ -104,7 +104,8 @@ public sealed class FoundationTests
         {
             Assert.Equal(18, property.GetPrecision());
             Assert.Equal(property.Name is "Quantity" or "ReorderPoint" or "Weight" or "PackagingQuantity" or
-                "BeforeQuantity" or "AfterQuantity" or "SystemQuantity" or "ActualQuantity" or "Difference" ? 3 : 2, property.GetScale());
+                "BeforeQuantity" or "AfterQuantity" or "SystemQuantity" or "ActualQuantity" or "Difference" or
+                "QuantityReceived" or "QuantityRemaining" or "BreakHours" or "HoursWorked" or "OutputQuantity" ? 3 : 2, property.GetScale());
         });
     }
 

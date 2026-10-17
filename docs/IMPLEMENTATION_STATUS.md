@@ -23,8 +23,6 @@ baseline stabilization.
 
 ## Verification
 
-## Verification
-
 - `dotnet build Pos_Egypt_System.slnx` succeeded with zero warnings and zero
   errors.
 - `dotnet test tests/HeCashier.Tests/HeCashier.Tests.csproj` passed: 7 tests,
@@ -61,3 +59,27 @@ baseline stabilization.
 - `dotnet build Pos_Egypt_System.slnx` succeeded with 0 warnings and 0 errors.
 - `dotnet test tests/HeCashier.Tests/HeCashier.Tests.csproj` passed: 13 tests,
   0 failed, 0 skipped.
+
+## Phase 1.5: Complete Master Schema and Seed Data
+
+### Completed
+
+- Added the remaining master and operational entities to the EF Core model and
+  registered their tables, relationships, indexes, composite keys, restrictive
+  delete behavior, and decimal precision in `HeCashierDbContext`.
+- Added idempotent startup seeding for canonical Admin permissions, missing default
+  system settings, the default barcode-label template, and required catalog and
+  operational master records. Existing setting values and existing records are
+  preserved.
+- Added SQLite integration tests for catalog and permission seeding, repeat
+  initialization, physical schema creation, persistence, unique indexes, and
+  restrictive deletes.
+- Restored the schema reference with table groups, key and relationship behavior,
+  uniqueness rules, precision conventions, and startup seed definitions.
+
+### Verification
+
+- `dotnet build Pos_Egypt_System.slnx` succeeded with 0 warnings and 0 errors.
+- `dotnet test tests/HeCashier.Tests/HeCashier.Tests.csproj` passed:
+  17 tests, 0 failed, 0 skipped.
+- `git status --short` confirmed that no `Pos_Egypt.UI` files were modified.

@@ -8,6 +8,88 @@ public enum ShiftStatus
     Closed
 }
 
+public enum FinancialTransactionType
+{
+    OpeningBalance,
+    Deposit,
+    Withdrawal,
+    Transfer,
+    Sale,
+    Purchase,
+    CustomerCollection,
+    SupplierPayment,
+    Expense,
+    Salary,
+    Advance,
+    Refund,
+    Adjustment
+}
+
+public enum PaymentType
+{
+    Cash,
+    Credit,
+    Mixed,
+    Visa
+}
+
+public enum TransactionStatus
+{
+    Draft,
+    Completed,
+    Voided
+}
+
+public enum ReturnFinancialMode
+{
+    CashRefund,
+    CustomerCredit,
+    SupplierCredit,
+    SafeAdjustment,
+    BankAdjustment
+}
+
+public enum InstallmentStatus
+{
+    Pending,
+    PartiallyPaid,
+    Paid,
+    Overdue,
+    Cancelled
+}
+
+public enum PartyTransactionType
+{
+    OpeningBalance,
+    Invoice,
+    Payment,
+    Collection,
+    Discount,
+    Return,
+    ExternalDebt,
+    Adjustment,
+    InstallmentPayment
+}
+
+public enum EmployeeFinancialTransactionType
+{
+    Advance,
+    Loan,
+    Bonus,
+    Deduction,
+    Salary
+}
+
+public enum NotificationType
+{
+    LowStock,
+    SupplierPayable,
+    CustomerReceivable,
+    ExpiringProduct,
+    InstallmentDue,
+    System
+}
+
 public enum InventoryMovementType
 {
     OpeningBalance,
@@ -46,6 +128,11 @@ public class User
     [Required]
     public string PasswordHash { get; set; } = string.Empty;
 
+    [MaxLength(200)]
+    public string? DisplayName { get; set; }
+
+    public bool CanDepositToMainSafe { get; set; }
+
     public bool IsActive { get; set; } = true;
     public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
     public ICollection<Shift> Shifts { get; set; } = new List<Shift>();
@@ -68,6 +155,15 @@ public class Permission
 
     [Required, MaxLength(150)]
     public string Code { get; set; } = string.Empty;
+
+    [Required, MaxLength(150)]
+    public string Name { get; set; } = string.Empty;
+
+    [Required, MaxLength(100)]
+    public string Module { get; set; } = string.Empty;
+
+    [Required, MaxLength(50)]
+    public string Action { get; set; } = string.Empty;
 
     public ICollection<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();
 }
@@ -99,7 +195,15 @@ public class Shift
     public User User { get; set; } = null!;
     public DateTime StartedAtUtc { get; set; }
     public DateTime? ClosedAtUtc { get; set; }
+    public decimal OpeningBalance { get; set; }
+    public decimal? ClosingBalance { get; set; }
+    public decimal? ExpectedCash { get; set; }
+    public decimal? Difference { get; set; }
+    [MaxLength(1000)]
+    public string Notes { get; set; } = string.Empty;
     public ShiftStatus Status { get; set; } = ShiftStatus.Open;
+    public ICollection<Sale> Sales { get; set; } = new List<Sale>();
+    public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
 }
 
 public class Category
@@ -110,6 +214,10 @@ public class Category
     public string Name { get; set; } = string.Empty;
 
     public bool IsActive { get; set; } = true;
+
+    public int? ParentCategoryId { get; set; }
+    public Category? ParentCategory { get; set; }
+    public ICollection<Category> SubCategories { get; set; } = new List<Category>();
 
     public ICollection<Product> Products { get; set; } = new List<Product>();
 }
@@ -141,6 +249,7 @@ public class Product
 
     public decimal SellingPrice { get; set; }
     public decimal WholesalePrice { get; set; }
+    public decimal HalfWholesalePrice { get; set; }
     public decimal CostPrice { get; set; }
     public decimal PurchasePrice { get; set; }
     public decimal Quantity { get; set; }
@@ -160,6 +269,11 @@ public class Product
     [MaxLength(100)]
     public string? PackagingUnit { get; set; }
     public decimal? PackagingQuantity { get; set; }
+    [MaxLength(100)]
+    public string? ModelNumber { get; set; }
+    public bool DoesNotAffectInventory { get; set; }
+    public bool IsBarcodeScaleItem { get; set; }
+    public bool IsSoldByLength { get; set; }
     public bool IsActive { get; set; } = true;
     [MaxLength(1000)]
     public string? Notes { get; set; }
@@ -167,8 +281,11 @@ public class Product
     public Category? Category { get; set; }
     public int? UnitId { get; set; }
     public Unit? Unit { get; set; }
+    public int? ProductGroupId { get; set; }
+    public ProductGroup? ProductGroup { get; set; }
     public ICollection<ProductBarcode> Barcodes { get; set; } = new List<ProductBarcode>();
     public ICollection<WarehouseStock> WarehouseStocks { get; set; } = new List<WarehouseStock>();
+    public ICollection<ProductBatch> Batches { get; set; } = new List<ProductBatch>();
 }
 
 public class ProductBarcode
@@ -192,6 +309,7 @@ public class Store
     public string Name { get; set; } = string.Empty;
 
     public bool IsActive { get; set; } = true;
+    public bool IsDefault { get; set; }
     public ICollection<WarehouseStock> Stocks { get; set; } = new List<WarehouseStock>();
 }
 
@@ -278,7 +396,33 @@ public class Customer
     [Required, MaxLength(200)]
     public string Name { get; set; } = string.Empty;
 
+    [MaxLength(200)]
+    public string? CompanyName { get; set; }
+
+    [MaxLength(50)]
     public string? Phone { get; set; }
+
+    [MaxLength(50)]
+    public string? SecondaryPhone { get; set; }
+
+    [MaxLength(500)]
+    public string? Address { get; set; }
+
+    [MaxLength(50)]
+    public string? NationalId { get; set; }
+
+    public decimal OpeningBalance { get; set; }
+    public decimal CurrentBalance { get; set; }
+    public decimal? CreditLimit { get; set; }
+    public bool IsCashCustomer { get; set; }
+    public bool IsActive { get; set; } = true;
+    [MaxLength(1000)]
+    public string? Notes { get; set; }
+    public ICollection<Sale> Sales { get; set; } = new List<Sale>();
+    public ICollection<CustomerTransaction> Transactions { get; set; } = new List<CustomerTransaction>();
+    public ICollection<ExternalDebt> ExternalDebts { get; set; } = new List<ExternalDebt>();
+    public ICollection<CustomerCheck> Checks { get; set; } = new List<CustomerCheck>();
+    public ICollection<InstallmentContract> InstallmentContracts { get; set; } = new List<InstallmentContract>();
 }
 
 public class Supplier
@@ -288,18 +432,55 @@ public class Supplier
     [Required, MaxLength(200)]
     public string Name { get; set; } = string.Empty;
 
+    [MaxLength(200)]
+    public string? CompanyName { get; set; }
+
+    [MaxLength(50)]
     public string? Phone { get; set; }
+
+    [MaxLength(50)]
+    public string? SecondaryPhone { get; set; }
+
+    [MaxLength(500)]
+    public string? Address { get; set; }
+
+    public decimal OpeningBalance { get; set; }
+    public decimal CurrentBalance { get; set; }
+    public decimal? CreditLimit { get; set; }
+    public bool IsActive { get; set; } = true;
+    [MaxLength(1000)]
+    public string? Notes { get; set; }
+    public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
+    public ICollection<SupplierTransaction> Transactions { get; set; } = new List<SupplierTransaction>();
 }
 
 public class Sale
 {
     public int Id { get; set; }
+    [Required, MaxLength(50)]
+    public string InvoiceNumber { get; set; } = string.Empty;
     public DateTime CreatedAtUtc { get; set; }
     public int? CustomerId { get; set; }
     public Customer? Customer { get; set; }
     public int? ShiftId { get; set; }
     public Shift? Shift { get; set; }
+    public int? StoreId { get; set; }
+    public Store? Store { get; set; }
+    public int? UserId { get; set; }
+    public User? User { get; set; }
+    public PaymentType PaymentType { get; set; }
+    public decimal Subtotal { get; set; }
+    public decimal DiscountAmount { get; set; }
+    public decimal TaxAmount { get; set; }
+    public decimal DeliveryFee { get; set; }
+    public decimal NetTotal { get; set; }
+    public decimal PaidAmount { get; set; }
+    public decimal RemainingAmount { get; set; }
+    public TransactionStatus Status { get; set; } = TransactionStatus.Completed;
+    [MaxLength(1000)]
+    public string Notes { get; set; } = string.Empty;
     public ICollection<SaleLine> Lines { get; set; } = new List<SaleLine>();
+    public ICollection<SaleReturn> Returns { get; set; } = new List<SaleReturn>();
 }
 
 public class SaleLine
@@ -311,15 +492,42 @@ public class SaleLine
     public Product Product { get; set; } = null!;
     public decimal Quantity { get; set; }
     public decimal UnitPrice { get; set; }
+    public decimal CostSnapshot { get; set; }
+    public decimal DiscountAmount { get; set; }
+    public decimal TaxAmount { get; set; }
+    public decimal LineTotal { get; set; }
+    public int? StoreId { get; set; }
+    public Store? Store { get; set; }
+    public ICollection<SaleReturnLine> ReturnLines { get; set; } = new List<SaleReturnLine>();
 }
 
 public class Purchase
 {
     public int Id { get; set; }
+    [Required, MaxLength(50)]
+    public string InvoiceNumber { get; set; } = string.Empty;
     public DateTime CreatedAtUtc { get; set; }
     public int? SupplierId { get; set; }
     public Supplier? Supplier { get; set; }
+    public int? StoreId { get; set; }
+    public Store? Store { get; set; }
+    public int? ShiftId { get; set; }
+    public Shift? Shift { get; set; }
+    public int? UserId { get; set; }
+    public User? User { get; set; }
+    public PaymentType PaymentType { get; set; }
+    public decimal Subtotal { get; set; }
+    public decimal DiscountAmount { get; set; }
+    public decimal ShippingCost { get; set; }
+    public decimal TaxAmount { get; set; }
+    public decimal NetTotal { get; set; }
+    public decimal PaidAmount { get; set; }
+    public decimal RemainingAmount { get; set; }
+    public TransactionStatus Status { get; set; } = TransactionStatus.Completed;
+    [MaxLength(1000)]
+    public string Notes { get; set; } = string.Empty;
     public ICollection<PurchaseLine> Lines { get; set; } = new List<PurchaseLine>();
+    public ICollection<PurchaseReturn> Returns { get; set; } = new List<PurchaseReturn>();
 }
 
 public class PurchaseLine
@@ -331,6 +539,13 @@ public class PurchaseLine
     public Product Product { get; set; } = null!;
     public decimal Quantity { get; set; }
     public decimal UnitPrice { get; set; }
+    public decimal CostSnapshot { get; set; }
+    public decimal DiscountAmount { get; set; }
+    public decimal TaxAmount { get; set; }
+    public decimal LineTotal { get; set; }
+    public int? StoreId { get; set; }
+    public Store? Store { get; set; }
+    public ICollection<PurchaseReturnLine> ReturnLines { get; set; } = new List<PurchaseReturnLine>();
 }
 
 public class Safe
@@ -339,6 +554,10 @@ public class Safe
 
     [Required, MaxLength(150)]
     public string Name { get; set; } = string.Empty;
+
+    public decimal OpeningBalance { get; set; }
+    public decimal CurrentBalance { get; set; }
+    public bool IsActive { get; set; } = true;
 
     public ICollection<FinancialTransaction> Transactions { get; set; } = new List<FinancialTransaction>();
 }
@@ -350,14 +569,26 @@ public class BankAccount
     [Required, MaxLength(150)]
     public string Name { get; set; } = string.Empty;
 
+    [MaxLength(100)]
+    public string? AccountNumber { get; set; }
+    [MaxLength(100)]
+    public string? BankName { get; set; }
+    public decimal OpeningBalance { get; set; }
+    public decimal CurrentBalance { get; set; }
+    public bool IsActive { get; set; } = true;
+
     public ICollection<FinancialTransaction> Transactions { get; set; } = new List<FinancialTransaction>();
 }
 
 public class FinancialTransaction
 {
     public int Id { get; set; }
+    public FinancialTransactionType Type { get; set; }
     public decimal Amount { get; set; }
+    public decimal BalanceBefore { get; set; }
+    public decimal BalanceAfter { get; set; }
     public DateTime OccurredAtUtc { get; set; }
+    [MaxLength(1000)]
     public string Description { get; set; } = string.Empty;
     [MaxLength(50)]
     public string TransactionType { get; set; } = string.Empty;
@@ -369,6 +600,15 @@ public class FinancialTransaction
     public Safe? Safe { get; set; }
     public int? BankAccountId { get; set; }
     public BankAccount? BankAccount { get; set; }
+    public int? ShiftId { get; set; }
+    public Shift? Shift { get; set; }
+    [MaxLength(100)]
+    public string? ReferenceEntityType { get; set; }
+    public int? ReferenceEntityId { get; set; }
+    [MaxLength(200)]
+    public string? DepositorOrBeneficiaryName { get; set; }
+    public ICollection<CustomerTransaction> CustomerTransactions { get; set; } = new List<CustomerTransaction>();
+    public ICollection<SupplierTransaction> SupplierTransactions { get; set; } = new List<SupplierTransaction>();
 }
 
 public class ExpenseType
@@ -384,10 +624,26 @@ public class ExpenseType
 public class Expense
 {
     public int Id { get; set; }
+    [Required, MaxLength(50)]
+    public string VoucherNumber { get; set; } = string.Empty;
     public decimal Amount { get; set; }
     public DateTime OccurredAtUtc { get; set; }
     public int ExpenseTypeId { get; set; }
     public ExpenseType ExpenseType { get; set; } = null!;
+    public int? SafeId { get; set; }
+    public Safe? Safe { get; set; }
+    public int? BankAccountId { get; set; }
+    public BankAccount? BankAccount { get; set; }
+    public int? ShiftId { get; set; }
+    public Shift? Shift { get; set; }
+    public int? UserId { get; set; }
+    public User? User { get; set; }
+    public int? FinancialTransactionId { get; set; }
+    public FinancialTransaction? FinancialTransaction { get; set; }
+    [MaxLength(100)]
+    public string? InvoiceNumber { get; set; }
+    [MaxLength(1000)]
+    public string? Notes { get; set; }
     public string Description { get; set; } = string.Empty;
 }
 
@@ -502,8 +758,18 @@ public class ManufacturingMaterial
 public class SaleReturn
 {
     public int Id { get; set; }
+    [Required, MaxLength(50)]
+    public string ReturnNumber { get; set; } = string.Empty;
     public int SaleId { get; set; }
     public Sale Sale { get; set; } = null!;
+    public decimal Subtotal { get; set; }
+    public decimal TaxAmount { get; set; }
+    public decimal NetTotal { get; set; }
+    public ReturnFinancialMode FinancialMode { get; set; }
+    public int? FinancialTransactionId { get; set; }
+    public FinancialTransaction? FinancialTransaction { get; set; }
+    public int? StoreId { get; set; }
+    public Store? Store { get; set; }
     public DateTime OccurredAtUtc { get; set; }
     public int? UserId { get; set; }
     public User? User { get; set; }
@@ -517,8 +783,12 @@ public class SaleReturnLine
     public int Id { get; set; }
     public int SaleReturnId { get; set; }
     public SaleReturn SaleReturn { get; set; } = null!;
+    public int SaleLineId { get; set; }
+    public SaleLine SaleLine { get; set; } = null!;
     public int ProductId { get; set; }
     public Product Product { get; set; } = null!;
     public decimal Quantity { get; set; }
     public decimal UnitPrice { get; set; }
+    public decimal CostSnapshot { get; set; }
+    public decimal LineTotal { get; set; }
 }
