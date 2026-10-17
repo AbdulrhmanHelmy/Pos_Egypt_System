@@ -21,9 +21,14 @@ databases are not deleted automatically.
 
 ## Development login
 
-The first empty database receives the development-only account
-`devadmin` / `HeCashierDev2026!`. Only a salted password hash is stored. Replace
-this seed with a proper administrator provisioning flow before production use.
+Debug builds seed an empty database with the development-only account
+`devadmin` / `HeCashierDev2026!`. Only a salted password hash is stored. Release
+builds do not seed an account and require an administrator to provision users.
+
+## Future work
+
+Phase 4: add a first-run administrator setup flow. No first-run wizard is
+implemented in this phase.
 
 ## Troubleshooting
 

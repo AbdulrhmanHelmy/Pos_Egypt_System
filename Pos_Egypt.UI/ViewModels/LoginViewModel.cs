@@ -12,16 +12,23 @@ public sealed class LoginViewModel : ViewModelBase
     private string _password = string.Empty;
     private string _error = string.Empty;
     private bool _isBusy;
+    public string InitialSetupRequiredMessage { get; }
+#if DEBUG
+    public string DevelopmentCredentialsHint => "حساب التطوير: devadmin / HeCashierDev2026!";
+#else
+    public string DevelopmentCredentialsHint => string.Empty;
+#endif
     public string UserName { get => _userName; set => SetProperty(ref _userName, value); }
     public string Password { get => _password; set => SetProperty(ref _password, value); }
     public string Error { get => _error; private set => SetProperty(ref _error, value); }
     public RelayCommand LoginCommand { get; }
     public RelayCommand ExitCommand { get; }
 
-    public LoginViewModel(AuthenticationService authentication, Action<AuthenticatedUser> authenticated)
+    public LoginViewModel(AuthenticationService authentication, Action<AuthenticatedUser> authenticated, bool initialSetupRequired)
     {
         _authentication = authentication;
         _authenticated = authenticated;
+        InitialSetupRequiredMessage = initialSetupRequired ? "لا يوجد مستخدمون. يجب إتمام الإعداد الأولي بواسطة مسؤول النظام." : string.Empty;
         LoginCommand = new(async () => await LoginAsync());
         ExitCommand = new(() => Application.Current.Shutdown());
     }

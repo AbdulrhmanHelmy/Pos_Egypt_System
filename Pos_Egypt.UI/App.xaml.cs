@@ -26,10 +26,17 @@ public partial class App : Application
     {
         try
         {
-            await _databaseInitializer.InitializeAsync();
+            bool seedDevelopmentUser;
+#if DEBUG
+            seedDevelopmentUser = true;
+#else
+            seedDevelopmentUser = false;
+#endif
+            var initialSetupRequired = await _databaseInitializer.InitializeAsync(seedDevelopmentUser);
             MainWindow = new LoginWindow(new LoginViewModel(
                 new AuthenticationService(_databaseInitializer.Factory),
-                OpenShell));
+                OpenShell,
+                initialSetupRequired));
             MainWindow.Show();
         }
         catch (Exception exception)

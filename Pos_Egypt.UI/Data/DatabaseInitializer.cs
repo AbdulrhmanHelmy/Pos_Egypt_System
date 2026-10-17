@@ -26,7 +26,7 @@ public sealed class DatabaseInitializer
         Factory = new PooledDbContextFactory<HeCashierDbContext>(options);
     }
 
-    public async Task InitializeAsync()
+    public async Task<bool> InitializeAsync(bool seedDevelopmentUser)
     {
         if (ConfigurationError is not null)
             throw new InvalidOperationException(ConfigurationError);
@@ -34,10 +34,12 @@ public sealed class DatabaseInitializer
         Directory.CreateDirectory(DataRoot);
         await using var db = await Factory.CreateDbContextAsync();
         await db.Database.EnsureCreatedAsync();
-        if (!await db.Users.AnyAsync())
+        if (!await db.Users.AnyAsync() && seedDevelopmentUser)
         {
             db.Users.Add(new Models.User { UserName = "devadmin", PasswordHash = PasswordHasher.Hash("HeCashierDev2026!") });
             await db.SaveChangesAsync();
         }
+
+        return !await db.Users.AnyAsync();
     }
 }
